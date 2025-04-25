@@ -5,7 +5,6 @@ import {
   smoothStream,
   streamText,
 } from 'ai';
-import { auth } from '@/app/(auth)/auth';
 import { systemPrompt } from '@/lib/ai/prompts';
 import {
   deleteChatById,
@@ -25,6 +24,8 @@ import { requestSuggestions } from '@/lib/ai/tools/request-suggestions';
 import { getWeather } from '@/lib/ai/tools/get-weather';
 import { isProductionEnvironment } from '@/lib/constants';
 import { myProvider } from '@/lib/ai/providers';
+import { authOptions } from '@/app/(auth)/auth';
+import { getServerSession } from 'next-auth';
 
 export const maxDuration = 60;
 
@@ -40,7 +41,7 @@ export async function POST(request: Request) {
       selectedChatModel: string;
     } = await request.json();
 
-    const session = await auth();
+    const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
       return new Response('Unauthorized', { status: 401 });
@@ -173,7 +174,7 @@ export async function DELETE(request: Request) {
     return new Response('Not Found', { status: 404 });
   }
 
-  const session = await auth();
+  const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
     return new Response('Unauthorized', { status: 401 });

@@ -1,10 +1,11 @@
-import { auth } from '@/app/(auth)/auth';
+import { authOptions } from '@/app/(auth)/auth';
 import type { ArtifactKind } from '@/components/artifact';
 import {
   deleteDocumentsByIdAfterTimestamp,
   getDocumentsById,
   saveDocument,
 } from '@/lib/db/queries';
+import { getServerSession } from 'next-auth';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -14,7 +15,7 @@ export async function GET(request: Request) {
     return new Response('Missing id', { status: 400 });
   }
 
-  const session = await auth();
+  const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
     return new Response('Unauthorized', { status: 401 });
@@ -43,7 +44,7 @@ export async function POST(request: Request) {
     return new Response('Missing id', { status: 400 });
   }
 
-  const session = await auth();
+  const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
     return new Response('Unauthorized', { status: 401 });
@@ -90,7 +91,7 @@ export async function DELETE(request: Request) {
     return new Response('Missing timestamp', { status: 400 });
   }
 
-  const session = await auth();
+  const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
     return new Response('Unauthorized', { status: 401 });

@@ -1,1 +1,3 @@
-export { GET, POST } from '@/app/(auth)/auth';
+import handler from '@/app/(auth)/auth';
+
+export { handler as GET, handler as POST };

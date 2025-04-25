@@ -1,5 +1,6 @@
-import { auth } from '@/app/(auth)/auth';
+import { authOptions } from '@/app/(auth)/auth';
 import { getSuggestionsByDocumentId } from '@/lib/db/queries';
+import { getServerSession } from 'next-auth';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -9,7 +10,7 @@ export async function GET(request: Request) {
     return new Response('Not Found', { status: 404 });
   }
 
-  const session = await auth();
+  const session = await getServerSession(authOptions);
 
   if (!session || !session.user) {
     return new Response('Unauthorized', { status: 401 });

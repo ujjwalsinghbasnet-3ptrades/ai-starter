@@ -1,21 +1,19 @@
-import Form from 'next/form';
-
+'use client'
+import { signIn } from 'next-auth/react'
 import { Input } from './ui/input';
-import { Label } from './ui/label';
+import { Label } from '@radix-ui/react-label';
 
 export function AuthForm({
-  action,
+  onSubmit,
   children,
   defaultEmail = '',
 }: {
-  action: NonNullable<
-    string | ((formData: FormData) => void | Promise<void>) | undefined
-  >;
+  onSubmit: (e: React.FormEvent<HTMLFormElement>) => Promise<void>;
   children: React.ReactNode;
   defaultEmail?: string;
 }) {
   return (
-    <Form action={action} className="flex flex-col gap-4 px-4 sm:px-16">
+    <form onSubmit={onSubmit} className="flex flex-col gap-4 px-4 sm:px-16">
       <div className="flex flex-col gap-2">
         <Label
           htmlFor="email"
@@ -55,6 +53,6 @@ export function AuthForm({
       </div>
 
       {children}
-    </Form>
+    </form>
   );
 }
