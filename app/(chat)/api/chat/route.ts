@@ -1,11 +1,11 @@
-import {
-  type UIMessage,
-  appendResponseMessages,
-  createDataStreamResponse,
-  smoothStream,
-  streamText,
-} from 'ai';
+import { authOptions } from '@/app/(auth)/auth';
 import { systemPrompt } from '@/lib/ai/prompts';
+import { MyProvider } from '@/lib/ai/providers/providers';
+import { createDocument } from '@/lib/ai/tools/create-document';
+import { getWeather } from '@/lib/ai/tools/get-weather';
+import { requestSuggestions } from '@/lib/ai/tools/request-suggestions';
+import { updateDocument } from '@/lib/ai/tools/update-document';
+import { isProductionEnvironment } from '@/lib/constants';
 import {
   deleteChatById,
   getChatById,
@@ -17,15 +17,15 @@ import {
   getMostRecentUserMessage,
   getTrailingMessageId,
 } from '@/lib/utils';
-import { generateTitleFromUserMessage } from '../../actions';
-import { createDocument } from '@/lib/ai/tools/create-document';
-import { updateDocument } from '@/lib/ai/tools/update-document';
-import { requestSuggestions } from '@/lib/ai/tools/request-suggestions';
-import { getWeather } from '@/lib/ai/tools/get-weather';
-import { isProductionEnvironment } from '@/lib/constants';
-import { myProvider } from '@/lib/ai/providers';
-import { authOptions } from '@/app/(auth)/auth';
+import {
+  type UIMessage,
+  appendResponseMessages,
+  createDataStreamResponse,
+  smoothStream,
+  streamText,
+} from 'ai';
 import { getServerSession } from 'next-auth';
+import { generateTitleFromUserMessage } from '../../actions';
 
 export const maxDuration = 60;
 
@@ -40,6 +40,7 @@ export async function POST(request: Request) {
       messages: Array<UIMessage>;
       selectedChatModel: string;
     } = await request.json();
+    const myProvider = await MyProvider();
 
     const session = await getServerSession(authOptions);
 

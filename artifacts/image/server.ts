@@ -1,4 +1,4 @@
-import { myProvider } from '@/lib/ai/providers';
+import { myProvider } from '@/lib/ai/providers/providers';
 import { createDocumentHandler } from '@/lib/artifacts/server';
 import { experimental_generateImage } from 'ai';
 
