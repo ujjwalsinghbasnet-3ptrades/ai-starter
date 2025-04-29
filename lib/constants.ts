@@ -9,3 +9,5 @@ export const isTestEnvironment = Boolean(
 );
 
 export const DUMMY_PASSWORD = generateDummyPassword();
+
+export const AI_PROVIDER_CONFIG_KEY = "ai-provider-config";

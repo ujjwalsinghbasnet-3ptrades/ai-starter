@@ -6,10 +6,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { getAvailableProviders } from "@/lib/ai/providers/get-provider-list";
-import {
-  AIProvider,
-  DEFAULT_PROVIDER,
-} from "@/lib/ai/providers/providers-config";
+import type { AIProvider } from "@/lib/ai/providers/providers-config";
+import { DEFAULT_PROVIDER } from "@/lib/ai/providers/providers-config";
 import { cn } from "@/lib/utils";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
