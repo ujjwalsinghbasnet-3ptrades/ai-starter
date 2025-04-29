@@ -13,6 +13,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { AI_PROVIDER_CONFIG_KEY } from "@/lib/constants";
+import { extractPdfText, readFileContent } from "@/lib/file-utils";
 import { providersList } from "@/lib/providers/provider-list";
 import { estimateTokens } from "@/lib/providers/tokenization";
 import type { TokenizationResult } from "@/lib/types";
@@ -87,35 +88,20 @@ export function TokenEstimator() {
 
     setIsProcessing(true);
     try {
-      // This is a simplified demo - in a real app, you'd process the file
-      // and extract its text content. For now, we'll simulate this.
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Simulate file reading
-      const fileReader = new FileReader();
-
-      fileReader.onload = async (e) => {
-        const fileContent = (e.target?.result as string) || "";
-        // For demo purposes, limit the content to prevent browser from hanging
-        const limitedContent = fileContent.substring(0, 10000);
-        const result = await estimateTokens(limitedContent, activeProviders);
-        setTokenization(result);
-        setIsProcessing(false);
-      };
-
-      fileReader.onerror = () => {
-        console.error("Error reading file");
-        setIsProcessing(false);
-      };
+      let fileContent = "";
 
       if (file.type === "application/pdf") {
-        // In a real app, use a PDF parsing library
-        fileReader.readAsText(file); // This won't work with real PDFs, just for demo
+        fileContent = await extractPdfText(file);
       } else {
-        fileReader.readAsText(file);
+        fileContent = await readFileContent(file);
       }
+
+      const limitedContent = fileContent.substring(0, 10000);
+      const result = await estimateTokens(limitedContent, activeProviders);
+      setTokenization(result);
     } catch (error) {
       console.error("Error processing file:", error);
+    } finally {
       setIsProcessing(false);
     }
   };

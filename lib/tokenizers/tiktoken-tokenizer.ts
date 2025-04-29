@@ -1,17 +1,17 @@
 import type { Tokenizer } from "@/lib/types/tokenizer";
-import { encoding_for_model, get_encoding, type TiktokenModel } from "tiktoken";
+import { encodingForModel, getEncoding, type TiktokenModel } from "js-tiktoken";
 
 export class TikTokenTokenizer implements Tokenizer {
-  private encoder: ReturnType<typeof get_encoding>;
+  private encoder: ReturnType<typeof getEncoding>;
 
   constructor(modelHint: string) {
     try {
       // Try to get encoding specific to the model
-      this.encoder = encoding_for_model(modelHint as TiktokenModel);
+      this.encoder = encodingForModel(modelHint as TiktokenModel);
     } catch (error) {
       console.warn(`Warning: No specific encoding for model "${modelHint}". Using cl100k_base fallback.`);
       // If model isn't recognized, use fallback
-      this.encoder = get_encoding("cl100k_base");
+      this.encoder = getEncoding("cl100k_base");
     }
   }
 
@@ -20,7 +20,7 @@ export class TikTokenTokenizer implements Tokenizer {
   }
 
   decode(tokens: number[]): string {
-    return new TextDecoder().decode(this.encoder.decode(new Uint32Array(tokens)));
+   return this.encoder.decode(tokens);
   }
 
   countTokens(text: string): number {

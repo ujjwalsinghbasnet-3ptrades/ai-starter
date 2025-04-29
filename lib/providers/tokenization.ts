@@ -26,7 +26,6 @@ export const estimateTokens = async (
     }
   }
   
-  // Calculate cost estimates
   const estimatedCost: { [providerId: string]: { [modelId: string]: number } } = {};
   
   for (const provider of providers) {
@@ -37,7 +36,6 @@ export const estimateTokens = async (
       const inputCost = (tokenCount / model.unitSize) * model.inputCost;
       
       // Estimate output tokens (typically varies between models)
-      // For demo, we'll use a simple approximation
       const outputTokenCount = model.isImageModel ? 0 : Math.round(tokenCount * 0.3);
       const outputCost = (outputTokenCount / model.unitSize) * model.outputCost;
       
