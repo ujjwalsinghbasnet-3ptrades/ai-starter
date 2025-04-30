@@ -1,22 +1,26 @@
-import { compare } from 'bcrypt-ts';
-import NextAuth, { type User, type Session, NextAuthOptions, SessionStrategy } from 'next-auth';
-import CredentialProvider from 'next-auth/providers/credentials';
-import { getUser } from '@/lib/db/queries';
-import { JWT } from 'next-auth/jwt';
+import { getUser } from "@/lib/db/queries";
+import { compare } from "bcrypt-ts";
+import NextAuth, {
+  type NextAuthOptions,
+  type Session,
+  type SessionStrategy,
+} from "next-auth";
+import type { JWT } from "next-auth/jwt";
+import CredentialProvider from "next-auth/providers/credentials";
 
 const MAX_AGE = 30 * 24 * 60 * 60;
 
-declare module 'next-auth' {
+declare module "next-auth" {
   interface Session {
     user: {
       id: string;
       email?: string | null;
       name?: string | null;
-    }
+    };
   }
 }
 
-export const authOptions:NextAuthOptions = {
+export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt" as SessionStrategy,
     maxAge: MAX_AGE,
@@ -28,14 +32,13 @@ export const authOptions:NextAuthOptions = {
   providers: [
     CredentialProvider({
       credentials: {},
-      async authorize({email, password}: any) {
+      async authorize({ email, password }: any) {
         if (!email || !password) {
-          return null
+          return null;
         }
         const users = await getUser(email);
 
         const [user] = users;
-        console.log(user);
         if (!user.password) {
           return null;
         }
@@ -54,13 +57,7 @@ export const authOptions:NextAuthOptions = {
 
       return token;
     },
-    async session({
-      session,
-      token,
-    }: {
-      session: Session;
-      token: JWT;
-    }) {
+    async session({ session, token }: { session: Session; token: JWT }) {
       if (session.user) {
         session.user.id = token.id as string;
       }
@@ -68,6 +65,6 @@ export const authOptions:NextAuthOptions = {
       return session;
     },
   },
-}
+};
 
 export default NextAuth(authOptions);

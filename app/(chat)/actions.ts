@@ -1,19 +1,26 @@
-'use server';
+"use server";
 
-import { generateText, Message } from 'ai';
-import { cookies } from 'next/headers';
+import { generateText, type Message } from "ai";
+import { cookies } from "next/headers";
 
-import { VisibilityType } from '@/components/visibility-selector';
-import { myProvider } from '@/lib/ai/providers/providers';
+import type { VisibilityType } from "@/components/visibility-selector";
+import { AI_PROVIDER_COOKIE_NAME } from "@/lib/constants";
 import {
   deleteMessagesByChatIdAfterTimestamp,
   getMessageById,
   updateChatVisiblityById,
-} from '@/lib/db/queries';
+} from "@/lib/db/queries";
+import { createProvider } from "@/lib/providers/provider-factory";
 
 export async function saveChatModelAsCookie(model: string) {
   const cookieStore = await cookies();
-  cookieStore.set('chat-model', model);
+  cookieStore.set("chat-model", model);
+}
+export async function setProviderCookie(providerId: string) {
+  if (!providerId) return;
+
+  const cookieStore = await cookies();
+  cookieStore.set(AI_PROVIDER_COOKIE_NAME, providerId);
 }
 
 export async function generateTitleFromUserMessage({
@@ -21,8 +28,9 @@ export async function generateTitleFromUserMessage({
 }: {
   message: Message;
 }) {
+  const myProvider = await createProvider();
   const { text: title } = await generateText({
-    model: myProvider.languageModel('title-model'),
+    model: myProvider.languageModel("title-model"),
     system: `\n
     - you will generate a short title based on the first message a user begins a conversation with
     - ensure it is not more than 80 characters long

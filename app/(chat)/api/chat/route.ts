@@ -1,31 +1,31 @@
-import { authOptions } from '@/app/(auth)/auth';
-import { systemPrompt } from '@/lib/ai/prompts';
-import { MyProvider } from '@/lib/ai/providers/providers';
-import { createDocument } from '@/lib/ai/tools/create-document';
-import { getWeather } from '@/lib/ai/tools/get-weather';
-import { requestSuggestions } from '@/lib/ai/tools/request-suggestions';
-import { updateDocument } from '@/lib/ai/tools/update-document';
-import { isProductionEnvironment } from '@/lib/constants';
+import { authOptions } from "@/app/(auth)/auth";
+import { systemPrompt } from "@/lib/ai/prompts";
+import { createDocument } from "@/lib/ai/tools/create-document";
+import { getWeather } from "@/lib/ai/tools/get-weather";
+import { requestSuggestions } from "@/lib/ai/tools/request-suggestions";
+import { updateDocument } from "@/lib/ai/tools/update-document";
+import { isProductionEnvironment } from "@/lib/constants";
 import {
   deleteChatById,
   getChatById,
   saveChat,
   saveMessages,
-} from '@/lib/db/queries';
+} from "@/lib/db/queries";
+import { createProvider } from "@/lib/providers/provider-factory";
 import {
   generateUUID,
   getMostRecentUserMessage,
   getTrailingMessageId,
-} from '@/lib/utils';
+} from "@/lib/utils";
 import {
   type UIMessage,
   appendResponseMessages,
   createDataStreamResponse,
   smoothStream,
   streamText,
-} from 'ai';
-import { getServerSession } from 'next-auth';
-import { generateTitleFromUserMessage } from '../../actions';
+} from "ai";
+import { getServerSession } from "next-auth";
+import { generateTitleFromUserMessage } from "../../actions";
 
 export const maxDuration = 60;
 
@@ -40,18 +40,18 @@ export async function POST(request: Request) {
       messages: Array<UIMessage>;
       selectedChatModel: string;
     } = await request.json();
-    const myProvider = await MyProvider();
+    const myProvider = await createProvider();
 
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
-      return new Response('Unauthorized', { status: 401 });
+      return new Response("Unauthorized", { status: 401 });
     }
 
     const userMessage = getMostRecentUserMessage(messages);
 
     if (!userMessage) {
-      return new Response('No user message found', { status: 400 });
+      return new Response("No user message found", { status: 400 });
     }
 
     const chat = await getChatById({ id });
@@ -64,7 +64,7 @@ export async function POST(request: Request) {
       await saveChat({ id, userId: session.user.id, title });
     } else {
       if (chat.userId !== session.user.id) {
-        return new Response('Forbidden', { status: 403 });
+        return new Response("Forbidden", { status: 403 });
       }
     }
 
@@ -73,31 +73,30 @@ export async function POST(request: Request) {
         {
           chatId: id,
           id: userMessage.id,
-          role: 'user',
+          role: "user",
           parts: userMessage.parts,
           attachments: userMessage.experimental_attachments ?? [],
           createdAt: new Date(),
         },
       ],
     });
-
     return createDataStreamResponse({
       execute: (dataStream) => {
         const result = streamText({
-          model: myProvider.languageModel(selectedChatModel),
-          system: systemPrompt({ selectedChatModel }),
+          model: myProvider.languageModel("chat-model"),
+          system: systemPrompt({ selectedChatModel: "chat-model" }),
           messages,
           maxSteps: 5,
           experimental_activeTools:
-            selectedChatModel === 'chat-model-reasoning'
+            selectedChatModel === "chat-model-reasoning"
               ? []
               : [
-                  'getWeather',
-                  'createDocument',
-                  'updateDocument',
-                  'requestSuggestions',
+                  "getWeather",
+                  "createDocument",
+                  "updateDocument",
+                  "requestSuggestions",
                 ],
-          experimental_transform: smoothStream({ chunking: 'word' }),
+          experimental_transform: smoothStream({ chunking: "word" }),
           experimental_generateMessageId: generateUUID,
           tools: {
             getWeather,
@@ -113,12 +112,12 @@ export async function POST(request: Request) {
               try {
                 const assistantId = getTrailingMessageId({
                   messages: response.messages.filter(
-                    (message) => message.role === 'assistant',
+                    (message) => message.role === "assistant"
                   ),
                 });
 
                 if (!assistantId) {
-                  throw new Error('No assistant message found!');
+                  throw new Error("No assistant message found!");
                 }
 
                 const [, assistantMessage] = appendResponseMessages({
@@ -140,13 +139,13 @@ export async function POST(request: Request) {
                   ],
                 });
               } catch (_) {
-                console.error('Failed to save chat');
+                console.error("Failed to save chat");
               }
             }
           },
           experimental_telemetry: {
             isEnabled: isProductionEnvironment,
-            functionId: 'stream-text',
+            functionId: "stream-text",
           },
         });
 
@@ -157,11 +156,11 @@ export async function POST(request: Request) {
         });
       },
       onError: () => {
-        return 'Oops, an error occurred!';
+        return "Oops, an error occurred!";
       },
     });
   } catch (error) {
-    return new Response('An error occurred while processing your request!', {
+    return new Response("An error occurred while processing your request!", {
       status: 500,
     });
   }
@@ -169,30 +168,30 @@ export async function POST(request: Request) {
 
 export async function DELETE(request: Request) {
   const { searchParams } = new URL(request.url);
-  const id = searchParams.get('id');
+  const id = searchParams.get("id");
 
   if (!id) {
-    return new Response('Not Found', { status: 404 });
+    return new Response("Not Found", { status: 404 });
   }
 
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    return new Response('Unauthorized', { status: 401 });
+    return new Response("Unauthorized", { status: 401 });
   }
 
   try {
     const chat = await getChatById({ id });
 
     if (chat.userId !== session.user.id) {
-      return new Response('Forbidden', { status: 403 });
+      return new Response("Forbidden", { status: 403 });
     }
 
     const deletedChat = await deleteChatById({ id });
 
     return Response.json(deletedChat, { status: 200 });
   } catch (error) {
-    return new Response('An error occurred while processing your request!', {
+    return new Response("An error occurred while processing your request!", {
       status: 500,
     });
   }

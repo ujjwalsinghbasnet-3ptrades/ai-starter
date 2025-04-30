@@ -1,14 +1,15 @@
-import { cookies } from 'next/headers';
-import { notFound } from 'next/navigation';
+import { cookies } from "next/headers";
+import { notFound } from "next/navigation";
 
-import { authOptions } from '@/app/(auth)/auth';
-import { Chat } from '@/components/chat';
-import { getChatById, getMessagesByChatId } from '@/lib/db/queries';
-import { DataStreamHandler } from '@/components/data-stream-handler';
-import { DEFAULT_CHAT_MODEL } from '@/lib/ai/models';
-import { DBMessage } from '@/lib/db/schema';
-import { Attachment, UIMessage } from 'ai';
-import { getServerSession } from 'next-auth';
+import { authOptions } from "@/app/(auth)/auth";
+import { Chat } from "@/components/chat";
+import { DataStreamHandler } from "@/components/data-stream-handler";
+import { DEFAULT_CHAT_MODEL } from "@/lib/ai/models";
+import { AI_PROVIDER_COOKIE_NAME, DEFAULT_PROVIDER } from "@/lib/constants";
+import { getChatById, getMessagesByChatId } from "@/lib/db/queries";
+import type { DBMessage } from "@/lib/db/schema";
+import type { Attachment, UIMessage } from "ai";
+import { getServerSession } from "next-auth";
 
 export default async function Page(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -21,7 +22,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
 
   const session = await getServerSession(authOptions);
 
-  if (chat.visibility === 'private') {
+  if (chat.visibility === "private") {
     if (!session || !session.user) {
       return notFound();
     }
@@ -38,10 +39,10 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
   function convertToUIMessages(messages: Array<DBMessage>): Array<UIMessage> {
     return messages.map((message) => ({
       id: message.id,
-      parts: message.parts as UIMessage['parts'],
-      role: message.role as UIMessage['role'],
+      parts: message.parts as UIMessage["parts"],
+      role: message.role as UIMessage["role"],
       // Note: content will soon be deprecated in @ai-sdk/react
-      content: '',
+      content: "",
       createdAt: message.createdAt,
       experimental_attachments:
         (message.attachments as Array<Attachment>) ?? [],
@@ -49,7 +50,8 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
   }
 
   const cookieStore = await cookies();
-  const chatModelFromCookie = cookieStore.get('chat-model');
+  const chatModelFromCookie = cookieStore.get("chat-model");
+  const providerIdFromCookie = cookieStore.get(AI_PROVIDER_COOKIE_NAME);
 
   if (!chatModelFromCookie) {
     return (
@@ -58,6 +60,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
           id={chat.id}
           initialMessages={convertToUIMessages(messagesFromDb)}
           selectedChatModel={DEFAULT_CHAT_MODEL}
+          selectedProvider={providerIdFromCookie?.value || DEFAULT_PROVIDER}
           selectedVisibilityType={chat.visibility}
           isReadonly={session?.user?.id !== chat.userId}
         />
@@ -72,6 +75,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
         id={chat.id}
         initialMessages={convertToUIMessages(messagesFromDb)}
         selectedChatModel={chatModelFromCookie.value}
+        selectedProvider={providerIdFromCookie?.value || DEFAULT_PROVIDER}
         selectedVisibilityType={chat.visibility}
         isReadonly={session?.user?.id !== chat.userId}
       />

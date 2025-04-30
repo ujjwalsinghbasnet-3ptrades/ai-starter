@@ -68,7 +68,6 @@ export function TokenEstimator() {
     setIsProcessing(true);
     try {
       const result = await estimateTokens(inputText, activeProviders);
-      console.log("result", result);
       setTokenization(result);
     } catch (error) {
       console.error("Error estimating tokens:", error);

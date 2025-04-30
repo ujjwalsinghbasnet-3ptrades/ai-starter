@@ -1,26 +1,28 @@
-'use client';
+"use client";
 
-import { useRouter } from 'next/navigation';
-import { useWindowSize } from 'usehooks-ts';
+import { useRouter } from "next/navigation";
+import { useWindowSize } from "usehooks-ts";
 
-import { ModelSelector } from '@/components/model-selector';
-import { SidebarToggle } from '@/components/sidebar-toggle';
-import { Button } from '@/components/ui/button';
-import { memo } from 'react';
-import { PlusIcon } from './icons';
-import { ProviderSelector } from './provider-selector';
-import { useSidebar } from './ui/sidebar';
-import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
-import { type VisibilityType, VisibilitySelector } from './visibility-selector';
+import { ModelSelector } from "@/components/model-selector";
+import { SidebarToggle } from "@/components/sidebar-toggle";
+import { Button } from "@/components/ui/button";
+import { memo } from "react";
+import { PlusIcon } from "./icons";
+import { ProviderSelector } from "./provider-selector";
+import { useSidebar } from "./ui/sidebar";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { type VisibilityType, VisibilitySelector } from "./visibility-selector";
 
 function PureChatHeader({
   chatId,
   selectedModelId,
+  selectedProviderId,
   selectedVisibilityType,
   isReadonly,
 }: {
   chatId: string;
   selectedModelId: string;
+  selectedProviderId: string;
   selectedVisibilityType: VisibilityType;
   isReadonly: boolean;
 }) {
@@ -40,7 +42,7 @@ function PureChatHeader({
               variant="outline"
               className="order-2 md:order-1 md:px-2 px-2 md:h-fit ml-auto md:ml-0"
               onClick={() => {
-                router.push('/');
+                router.push("/");
                 router.refresh();
               }}
             >
@@ -59,7 +61,12 @@ function PureChatHeader({
         />
       )}
 
-      <ProviderSelector />
+      {!isReadonly && (
+        <ProviderSelector
+          selectedProviderId={selectedProviderId}
+          className="order-1 md:order-2"
+        />
+      )}
 
       {!isReadonly && (
         <VisibilitySelector
@@ -73,5 +80,8 @@ function PureChatHeader({
 }
 
 export const ChatHeader = memo(PureChatHeader, (prevProps, nextProps) => {
-  return prevProps.selectedModelId === nextProps.selectedModelId;
+  return (
+    prevProps.selectedModelId === nextProps.selectedModelId &&
+    prevProps.selectedProviderId === nextProps.selectedProviderId
+  );
 });
