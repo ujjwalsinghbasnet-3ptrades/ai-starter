@@ -3,7 +3,6 @@
 import { CostBreakdown } from "@/components/settings/cost-breakdown";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -49,18 +48,6 @@ export function TokenEstimator() {
       setActiveProviders([providersList[0].id]);
     }
   }, []);
-
-  useEffect(() => {
-    // Estimate tokens when text changes, but with debounce
-    const debounceTimer = setTimeout(() => {
-      if (inputText.trim().length > 0) {
-        estimateTextTokens();
-      }
-    }, 500);
-
-    return () => clearTimeout(debounceTimer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inputText, activeProviders]);
 
   const estimateTextTokens = async () => {
     if (!inputText.trim()) return;
@@ -143,9 +130,18 @@ export function TokenEstimator() {
             <div className="flex justify-between items-center">
               <Label htmlFor="text-input">Enter text to estimate tokens</Label>
               {tokenization && (
-                <span className="text-sm text-muted-foreground">
-                  {tokenization.tokenCount.toLocaleString()} tokens
-                </span>
+                <div className="flex gap-2">
+                  {Object.entries(tokenization.tokenCounts).map(
+                    ([providerId, count]) => (
+                      <span
+                        key={providerId}
+                        className="text-sm text-muted-foreground"
+                      >
+                        {providerId}: {count.toLocaleString()} tokens
+                      </span>
+                    )
+                  )}
+                </div>
               )}
             </div>
             <Textarea
@@ -155,14 +151,21 @@ export function TokenEstimator() {
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
             />
+            <Button
+              onClick={estimateTextTokens}
+              disabled={!inputText.trim() || isProcessing}
+              className="w-full"
+            >
+              {isProcessing ? (
+                <>
+                  <Loader2 className="size-4 mr-2 animate-spin" />
+                  Estimating tokens...
+                </>
+              ) : (
+                "Estimate Tokens"
+              )}
+            </Button>
           </div>
-
-          {isProcessing && (
-            <div className="flex items-center justify-center py-4">
-              <Loader2 className="size-6 animate-spin text-primary mr-2" />
-              <span>Estimating tokens...</span>
-            </div>
-          )}
 
           {tokenization && !isProcessing && (
             <div className="space-y-6 animate-in fade-in-50 duration-300">
@@ -174,7 +177,9 @@ export function TokenEstimator() {
                     style={{
                       width: `${Math.min(
                         100,
-                        (tokenization.tokenCount / 1000) * 4
+                        (Math.max(...Object.values(tokenization.tokenCounts)) /
+                          1000) *
+                          4
                       )}%`,
                     }}
                   />
@@ -258,21 +263,20 @@ export function TokenEstimator() {
                   </Button>
                 </div>
 
-                {!tokenization && !isProcessing && (
-                  <Button onClick={processFile} className="w-full">
-                    Analyze File
-                  </Button>
-                )}
-
-                {isProcessing && (
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <span>Processing file...</span>
-                      <span>Please wait</span>
-                    </div>
-                    <Progress value={45} className="h-2" />
-                  </div>
-                )}
+                <Button
+                  onClick={processFile}
+                  disabled={isProcessing}
+                  className="w-full"
+                >
+                  {isProcessing ? (
+                    <>
+                      <Loader2 className="size-4 mr-2 animate-spin" />
+                      Analyzing file...
+                    </>
+                  ) : (
+                    "Analyze File"
+                  )}
+                </Button>
               </div>
             )}
           </div>
@@ -283,10 +287,16 @@ export function TokenEstimator() {
                 <h4 className="text-sm font-medium mb-2">Analysis Results</h4>
                 <div className="text-sm text-muted-foreground space-y-1">
                   <div className="flex justify-between">
-                    <span>Total tokens:</span>
-                    <span className="font-medium">
-                      {tokenization.tokenCount.toLocaleString()}
-                    </span>
+                    <span>Token counts:</span>
+                    <div className="flex flex-col items-end">
+                      {Object.entries(tokenization.tokenCounts).map(
+                        ([providerId, count]) => (
+                          <span key={providerId} className="font-medium">
+                            {providerId}: {count.toLocaleString()}
+                          </span>
+                        )
+                      )}
+                    </div>
                   </div>
                   <div className="flex justify-between">
                     <span>File type:</span>

@@ -9,7 +9,9 @@ export class TikTokenTokenizer implements Tokenizer {
       // Try to get encoding specific to the model
       this.encoder = encodingForModel(modelHint as TiktokenModel);
     } catch (error) {
-      console.warn(`Warning: No specific encoding for model "${modelHint}". Using cl100k_base fallback.`);
+      console.warn(
+        `Warning: No specific encoding for model "${modelHint}". Using cl100k_base fallback.`
+      );
       // If model isn't recognized, use fallback
       this.encoder = getEncoding("cl100k_base");
     }
@@ -20,10 +22,10 @@ export class TikTokenTokenizer implements Tokenizer {
   }
 
   decode(tokens: number[]): string {
-   return this.encoder.decode(tokens);
+    return this.encoder.decode(tokens);
   }
 
-  countTokens(text: string): number {
+  async countTokens(text: string): Promise<number> {
     return this.encode(text).length;
   }
 }
