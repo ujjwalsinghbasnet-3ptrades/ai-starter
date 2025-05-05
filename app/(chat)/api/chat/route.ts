@@ -1,4 +1,5 @@
 import { authOptions } from "@/app/(auth)/auth";
+import { providerRegistry } from "@/lib/ai/ai-config";
 import { systemPrompt } from "@/lib/ai/prompts";
 import { createDocument } from "@/lib/ai/tools/create-document";
 import { getWeather } from "@/lib/ai/tools/get-weather";
@@ -11,7 +12,6 @@ import {
   saveChat,
   saveMessages,
 } from "@/lib/db/queries";
-import { createProvider } from "@/lib/providers/provider-factory";
 import {
   generateUUID,
   getMostRecentUserMessage,
@@ -35,13 +35,18 @@ export async function POST(request: Request) {
       id,
       messages,
       selectedChatModel,
+      selectedProviderModel,
     }: {
       id: string;
       messages: Array<UIMessage>;
       selectedChatModel: string;
+      selectedProviderModel: string;
     } = await request.json();
-    const myProvider = await createProvider();
-
+    console.log({ selectedChatModel, selectedProviderModel });
+    const myProvider = providerRegistry.languageModel(
+      selectedProviderModel as any
+    );
+    console.log({ myProvider });
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
@@ -83,7 +88,7 @@ export async function POST(request: Request) {
     return createDataStreamResponse({
       execute: (dataStream) => {
         const result = streamText({
-          model: myProvider.languageModel("chat-model"),
+          model: myProvider,
           system: systemPrompt({ selectedChatModel: "chat-model" }),
           messages,
           maxSteps: 5,

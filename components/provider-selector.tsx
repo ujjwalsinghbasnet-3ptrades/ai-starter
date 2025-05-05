@@ -34,6 +34,11 @@ export function ProviderSelector({
   const [optimisticModelId, setOptimisticModelId] = useOptimistic(
     selectedProviderModelId.split(":")[1] || ""
   );
+  console.log({
+    optimisticModelId,
+    selectedProviderModelId,
+    optimisticProviderId,
+  });
   const [expandedProviderId, setExpandedProviderId] = useState<string | null>(
     null
   );

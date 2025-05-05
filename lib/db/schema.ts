@@ -5,6 +5,7 @@ import {
   foreignKey,
   integer,
   json,
+  jsonb,
   pgTable,
   primaryKey,
   text,
@@ -175,6 +176,29 @@ export const models = pgTable("Models", {
   maxTokens: integer("max_tokens"),
   isImageModel: boolean("is_image_model").default(false),
   enabled: boolean("enabled").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const userProviderConfig = pgTable("UserProviderConfig", {
+  id: uuid("id").notNull().defaultRandom(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => user.id),
+  defaultProviderId: text("default_provider_id").references(() => providers.id),
+  providerSettings: jsonb("provider_settings").$type<{
+    [providerId: string]: {
+      enabled: boolean;
+      defaultModelId?: string;
+    };
+  }>(),
+  modelSettings: jsonb("model_settings").$type<{
+    [modelId: string]: {
+      enabled: boolean;
+      customInputCost?: number;
+      customOutputCost?: number;
+    };
+  }>(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

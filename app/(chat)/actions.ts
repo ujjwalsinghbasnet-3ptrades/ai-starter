@@ -4,10 +4,7 @@ import { generateText, type Message } from "ai";
 import { cookies } from "next/headers";
 
 import type { VisibilityType } from "@/components/visibility-selector";
-import {
-  AI_PROVIDER_COOKIE_NAME,
-  AI_PROVIDER_MODEL_COOKIE_NAME,
-} from "@/lib/constants";
+import { AI_PROVIDER_MODEL_COOKIE_NAME } from "@/lib/constants";
 import {
   deleteMessagesByChatIdAfterTimestamp,
   getMessageById,
@@ -18,12 +15,6 @@ import { createProvider } from "@/lib/providers/provider-factory";
 export async function saveChatModelAsCookie(model: string) {
   const cookieStore = await cookies();
   cookieStore.set("chat-model", model);
-}
-export async function setProviderCookie(providerId: string) {
-  if (!providerId) return;
-
-  const cookieStore = await cookies();
-  cookieStore.set(AI_PROVIDER_COOKIE_NAME, providerId);
 }
 
 export async function generateTitleFromUserMessage({

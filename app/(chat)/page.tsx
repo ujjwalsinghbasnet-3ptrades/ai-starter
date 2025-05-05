@@ -4,7 +4,7 @@ import { Chat } from "@/components/chat";
 import { DataStreamHandler } from "@/components/data-stream-handler";
 import { DEFAULT_CHAT_MODEL } from "@/lib/ai/models";
 import {
-  AI_PROVIDER_COOKIE_NAME,
+  AI_PROVIDER_MODEL_COOKIE_NAME,
   DEFAULT_PROVIDER_MODEL,
 } from "@/lib/constants";
 import { generateUUID } from "@/lib/utils";
@@ -13,7 +13,7 @@ export default async function Page() {
 
   const cookieStore = await cookies();
   const modelIdFromCookie = cookieStore.get("chat-model");
-  const providerIdFromCookie = cookieStore.get(AI_PROVIDER_COOKIE_NAME);
+  const providerIdFromCookie = cookieStore.get(AI_PROVIDER_MODEL_COOKIE_NAME);
 
   if (!modelIdFromCookie) {
     return (
