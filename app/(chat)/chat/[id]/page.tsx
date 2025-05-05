@@ -7,7 +7,7 @@ import { DataStreamHandler } from "@/components/data-stream-handler";
 import { DEFAULT_CHAT_MODEL } from "@/lib/ai/models";
 import {
   AI_PROVIDER_MODEL_COOKIE_NAME,
-  DEFAULT_PROVIDER,
+  DEFAULT_PROVIDER_MODEL,
 } from "@/lib/constants";
 import { getChatById, getMessagesByChatId } from "@/lib/db/queries";
 import type { DBMessage } from "@/lib/db/schema";
@@ -66,7 +66,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
           initialMessages={convertToUIMessages(messagesFromDb)}
           selectedChatModel={DEFAULT_CHAT_MODEL}
           selectedProviderModel={
-            providerModelIdFromCookie?.value || DEFAULT_PROVIDER
+            providerModelIdFromCookie?.value || DEFAULT_PROVIDER_MODEL
           }
           selectedVisibilityType={chat.visibility}
           isReadonly={session?.user?.id !== chat.userId}
@@ -83,7 +83,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
         initialMessages={convertToUIMessages(messagesFromDb)}
         selectedChatModel={chatModelFromCookie.value}
         selectedProviderModel={
-          providerModelIdFromCookie?.value || DEFAULT_PROVIDER
+          providerModelIdFromCookie?.value || DEFAULT_PROVIDER_MODEL
         }
         selectedVisibilityType={chat.visibility}
         isReadonly={session?.user?.id !== chat.userId}

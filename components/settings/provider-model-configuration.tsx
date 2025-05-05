@@ -83,7 +83,6 @@ export function ProviderModelConfiguration() {
     string | null
   >(null);
 
-  // Load saved configuration on mount
   useEffect(() => {
     const savedConfig = localStorage.getItem(AI_PROVIDER_CONFIG_KEY);
     if (savedConfig) {
@@ -150,7 +149,6 @@ export function ProviderModelConfiguration() {
     }
   }, []);
 
-  // Save configuration when it changes
   useEffect(() => {
     const config = {
       providers,
@@ -258,7 +256,6 @@ export function ProviderModelConfiguration() {
   };
 
   const resetToDefaultCosts = (providerId: string, modelId: string) => {
-    // Find the original costs from the initial provider list
     const originalProvider = providersList.find(
       (p: Provider) => p.id === providerId
     );

@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { AI_PROVIDER_CONFIG_KEY } from "@/lib/constants";
 import { getEnabledProviders } from "@/lib/providers/provider-list";
 import type { Provider } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -50,12 +51,10 @@ export function ProviderSelector({
     );
   }, [selectedProvider, optimisticModelId]);
 
-  // Get default model for provider if none is selected
   const displayModel = useMemo(() => {
     if (selectedModel) return selectedModel;
     if (!selectedProvider) return null;
 
-    // Try to find the default model for this provider
     const defaultModels = localStorage.getItem("ai-provider-config")
       ? JSON.parse(localStorage.getItem("ai-provider-config") || "{}")
           ?.defaultModels || {}
@@ -69,11 +68,9 @@ export function ProviderSelector({
       if (model) return model;
     }
 
-    // Fall back to first enabled model
     return selectedProvider.models.find((m) => m.enabled) || null;
   }, [selectedProvider, selectedModel]);
 
-  // Get the registry key in format 'providerId:modelId'
   const registryKey = useMemo(() => {
     if (!selectedProvider) return "";
     if (!displayModel) return selectedProvider.id;
@@ -94,9 +91,8 @@ export function ProviderSelector({
       setOptimisticProviderId(provider.id);
       setOptimisticModelId("");
 
-      // Get default model for this provider
-      const defaultModels = localStorage.getItem("ai-provider-config")
-        ? JSON.parse(localStorage.getItem("ai-provider-config") || "{}")
+      const defaultModels = localStorage.getItem(AI_PROVIDER_CONFIG_KEY)
+        ? JSON.parse(localStorage.getItem(AI_PROVIDER_CONFIG_KEY) || "{}")
             ?.defaultModels || {}
         : {};
 
@@ -105,7 +101,6 @@ export function ProviderSelector({
         provider.models.find((m) => m.enabled)?.id ||
         "";
 
-      // Set the combined cookie with provider:defaultModel format
       setProviderModelCookie(`${provider.id}:${defaultModelId}`);
     });
   };
@@ -117,7 +112,6 @@ export function ProviderSelector({
       setOptimisticProviderId(providerId);
       setOptimisticModelId(modelId);
 
-      // Set the combined cookie with provider:model format
       setProviderModelCookie(`${providerId}:${modelId}`);
     });
   };
@@ -170,9 +164,8 @@ export function ProviderSelector({
             const isExpanded = expandedProviderId === id;
             const isSelected = id === optimisticProviderId;
 
-            // Get default model for this provider
-            const defaultModels = localStorage.getItem("ai-provider-config")
-              ? JSON.parse(localStorage.getItem("ai-provider-config") || "{}")
+            const defaultModels = localStorage.getItem(AI_PROVIDER_CONFIG_KEY)
+              ? JSON.parse(localStorage.getItem(AI_PROVIDER_CONFIG_KEY) || "{}")
                   ?.defaultModels || {}
               : {};
             const defaultModelId = defaultModels[id] || enabledModels[0]?.id;

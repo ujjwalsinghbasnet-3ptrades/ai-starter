@@ -3,7 +3,10 @@ import { cookies } from "next/headers";
 import { Chat } from "@/components/chat";
 import { DataStreamHandler } from "@/components/data-stream-handler";
 import { DEFAULT_CHAT_MODEL } from "@/lib/ai/models";
-import { AI_PROVIDER_COOKIE_NAME, DEFAULT_PROVIDER } from "@/lib/constants";
+import {
+  AI_PROVIDER_COOKIE_NAME,
+  DEFAULT_PROVIDER_MODEL,
+} from "@/lib/constants";
 import { generateUUID } from "@/lib/utils";
 export default async function Page() {
   const id = generateUUID();
@@ -20,7 +23,9 @@ export default async function Page() {
           id={id}
           initialMessages={[]}
           selectedChatModel={DEFAULT_CHAT_MODEL}
-          selectedProvider={providerIdFromCookie?.value || DEFAULT_PROVIDER}
+          selectedProviderModel={
+            providerIdFromCookie?.value || DEFAULT_PROVIDER_MODEL
+          }
           selectedVisibilityType="private"
           isReadonly={false}
         />
@@ -36,7 +41,9 @@ export default async function Page() {
         id={id}
         initialMessages={[]}
         selectedChatModel={modelIdFromCookie.value}
-        selectedProvider={providerIdFromCookie?.value || DEFAULT_PROVIDER}
+        selectedProviderModel={
+          providerIdFromCookie?.value || DEFAULT_PROVIDER_MODEL
+        }
         selectedVisibilityType="private"
         isReadonly={false}
       />
