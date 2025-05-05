@@ -20,14 +20,14 @@ export function Chat({
   id,
   initialMessages,
   selectedChatModel,
-  selectedProvider,
+  selectedProviderModel,
   selectedVisibilityType,
   isReadonly,
 }: {
   id: string;
   initialMessages: Array<UIMessage>;
   selectedChatModel: string;
-  selectedProvider: string;
+  selectedProviderModel: string;
   selectedVisibilityType: VisibilityType;
   isReadonly: boolean;
 }) {
@@ -48,7 +48,7 @@ export function Chat({
     body: {
       id,
       selectedChatModel: selectedChatModel,
-      selectedProvider: selectedProvider,
+      selectedProviderModel: selectedProviderModel,
     },
     initialMessages,
     experimental_throttle: 100,
@@ -75,7 +75,7 @@ export function Chat({
         <ChatHeader
           chatId={id}
           selectedModelId={selectedChatModel}
-          selectedProviderId={selectedProvider}
+          selectedProviderModelId={selectedProviderModel}
           selectedVisibilityType={selectedVisibilityType}
           isReadonly={isReadonly}
         />

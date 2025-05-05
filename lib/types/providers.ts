@@ -10,6 +10,7 @@ export interface Model {
   maxTokens?: number; // Maximum context length
   isImageModel?: boolean;
   customCost?: boolean; // Whether the cost has been customized by the user
+  enabled?: boolean; // Whether the model is enabled
 }
 
 export interface Provider {

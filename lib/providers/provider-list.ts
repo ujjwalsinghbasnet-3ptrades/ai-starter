@@ -19,6 +19,7 @@ export const providersList: Provider[] = [
         outputCost: 0.03,
         unitSize: 1000,
         maxTokens: 128000,
+        enabled: true,
       },
       {
         id: "gpt-4-turbo",
@@ -28,6 +29,7 @@ export const providersList: Provider[] = [
         outputCost: 0.03,
         unitSize: 1000,
         maxTokens: 128000,
+        enabled: true,
       },
       {
         id: "gpt-3.5-turbo",
@@ -37,6 +39,7 @@ export const providersList: Provider[] = [
         outputCost: 0.0015,
         unitSize: 1000,
         maxTokens: 16000,
+        enabled: true,
       },
       {
         id: "dalle3",
@@ -46,6 +49,7 @@ export const providersList: Provider[] = [
         outputCost: 0.04,
         unitSize: 1,
         isImageModel: true,
+        enabled: true,
       },
     ],
   },
@@ -65,6 +69,7 @@ export const providersList: Provider[] = [
         outputCost: 0.075,
         unitSize: 1000,
         maxTokens: 200000,
+        enabled: true,
       },
       {
         id: "claude-3-sonnet",
@@ -74,6 +79,7 @@ export const providersList: Provider[] = [
         outputCost: 0.015,
         unitSize: 1000,
         maxTokens: 200000,
+        enabled: true,
       },
       {
         id: "claude-3-haiku",
@@ -83,6 +89,7 @@ export const providersList: Provider[] = [
         outputCost: 0.00125,
         unitSize: 1000,
         maxTokens: 200000,
+        enabled: true,
       },
     ],
   },
@@ -102,6 +109,7 @@ export const providersList: Provider[] = [
         outputCost: 0.0075,
         unitSize: 1000,
         maxTokens: 1000000,
+        enabled: true,
       },
       {
         id: "gemini-1.5-flash",
@@ -111,6 +119,7 @@ export const providersList: Provider[] = [
         outputCost: 0.0015,
         unitSize: 1000,
         maxTokens: 1000000,
+        enabled: true,
       },
     ],
   },
@@ -130,6 +139,7 @@ export const providersList: Provider[] = [
         outputCost: 0.006,
         unitSize: 1000,
         maxTokens: 128000,
+        enabled: true,
       },
     ],
   },
@@ -149,6 +159,7 @@ export const providersList: Provider[] = [
         outputCost: 0.024,
         unitSize: 1000,
         maxTokens: 32000,
+        enabled: true,
       },
       {
         id: "mistral-medium",
@@ -158,6 +169,7 @@ export const providersList: Provider[] = [
         outputCost: 0.0081,
         unitSize: 1000,
         maxTokens: 32000,
+        enabled: true,
       },
       {
         id: "mistral-small",
@@ -167,6 +179,7 @@ export const providersList: Provider[] = [
         outputCost: 0.0021,
         unitSize: 1000,
         maxTokens: 32000,
+        enabled: true,
       },
     ],
   },

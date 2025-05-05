@@ -16,13 +16,13 @@ import { type VisibilityType, VisibilitySelector } from "./visibility-selector";
 function PureChatHeader({
   chatId,
   selectedModelId,
-  selectedProviderId,
+  selectedProviderModelId,
   selectedVisibilityType,
   isReadonly,
 }: {
   chatId: string;
   selectedModelId: string;
-  selectedProviderId: string;
+  selectedProviderModelId: string;
   selectedVisibilityType: VisibilityType;
   isReadonly: boolean;
 }) {
@@ -63,7 +63,7 @@ function PureChatHeader({
 
       {!isReadonly && (
         <ProviderSelector
-          selectedProviderId={selectedProviderId}
+          selectedProviderModelId={selectedProviderModelId}
           className="order-1 md:order-2"
         />
       )}
@@ -82,6 +82,6 @@ function PureChatHeader({
 export const ChatHeader = memo(PureChatHeader, (prevProps, nextProps) => {
   return (
     prevProps.selectedModelId === nextProps.selectedModelId &&
-    prevProps.selectedProviderId === nextProps.selectedProviderId
+    prevProps.selectedProviderModelId === nextProps.selectedProviderModelId
   );
 });

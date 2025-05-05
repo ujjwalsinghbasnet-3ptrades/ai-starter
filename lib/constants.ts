@@ -9,6 +9,7 @@ export const isTestEnvironment = Boolean(
 );
 
 export const DUMMY_PASSWORD = generateDummyPassword();
-export const DEFAULT_PROVIDER = "openai";
+export const DEFAULT_PROVIDER = "openai:gpt-4o";
 export const AI_PROVIDER_CONFIG_KEY = "ai-provider-config";
 export const AI_PROVIDER_COOKIE_NAME = "selected-provider";
+export const AI_PROVIDER_MODEL_COOKIE_NAME = "selected-provider-model";

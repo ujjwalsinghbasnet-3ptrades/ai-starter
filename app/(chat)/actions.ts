@@ -4,7 +4,10 @@ import { generateText, type Message } from "ai";
 import { cookies } from "next/headers";
 
 import type { VisibilityType } from "@/components/visibility-selector";
-import { AI_PROVIDER_COOKIE_NAME } from "@/lib/constants";
+import {
+  AI_PROVIDER_COOKIE_NAME,
+  AI_PROVIDER_MODEL_COOKIE_NAME,
+} from "@/lib/constants";
 import {
   deleteMessagesByChatIdAfterTimestamp,
   getMessageById,
@@ -59,4 +62,14 @@ export async function updateChatVisibility({
   visibility: VisibilityType;
 }) {
   await updateChatVisiblityById({ chatId, visibility });
+}
+
+export async function setProviderModelCookie(modelId: string) {
+  const cookieStore = await cookies();
+  cookieStore.set(AI_PROVIDER_MODEL_COOKIE_NAME, modelId);
+}
+
+export async function setModelCookie(modelId: string) {
+  const cookieStore = await cookies();
+  cookieStore.set("ai-model", modelId);
 }

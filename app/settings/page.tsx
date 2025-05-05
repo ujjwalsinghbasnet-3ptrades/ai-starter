@@ -1,7 +1,7 @@
 "use client";
 
 import { ModelConfiguration } from "@/components/settings/model-configuration";
-import { ProviderSelector } from "@/components/settings/provider-selector";
+import { ProviderModelConfiguration } from "@/components/settings/provider-model-configuration";
 import { TokenEstimator } from "@/components/settings/token-estimator";
 import {
   Card,
@@ -42,7 +42,8 @@ export default function SettingsPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <ProviderSelector />
+                {/* <ProviderSelector /> */}
+                <ProviderModelConfiguration />
               </CardContent>
             </Card>
           </TabsContent>

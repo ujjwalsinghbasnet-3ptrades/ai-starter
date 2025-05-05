@@ -5,7 +5,10 @@ import { authOptions } from "@/app/(auth)/auth";
 import { Chat } from "@/components/chat";
 import { DataStreamHandler } from "@/components/data-stream-handler";
 import { DEFAULT_CHAT_MODEL } from "@/lib/ai/models";
-import { AI_PROVIDER_COOKIE_NAME, DEFAULT_PROVIDER } from "@/lib/constants";
+import {
+  AI_PROVIDER_MODEL_COOKIE_NAME,
+  DEFAULT_PROVIDER,
+} from "@/lib/constants";
 import { getChatById, getMessagesByChatId } from "@/lib/db/queries";
 import type { DBMessage } from "@/lib/db/schema";
 import type { Attachment, UIMessage } from "ai";
@@ -51,7 +54,9 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
 
   const cookieStore = await cookies();
   const chatModelFromCookie = cookieStore.get("chat-model");
-  const providerIdFromCookie = cookieStore.get(AI_PROVIDER_COOKIE_NAME);
+  const providerModelIdFromCookie = cookieStore.get(
+    AI_PROVIDER_MODEL_COOKIE_NAME
+  );
 
   if (!chatModelFromCookie) {
     return (
@@ -60,7 +65,9 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
           id={chat.id}
           initialMessages={convertToUIMessages(messagesFromDb)}
           selectedChatModel={DEFAULT_CHAT_MODEL}
-          selectedProvider={providerIdFromCookie?.value || DEFAULT_PROVIDER}
+          selectedProviderModel={
+            providerModelIdFromCookie?.value || DEFAULT_PROVIDER
+          }
           selectedVisibilityType={chat.visibility}
           isReadonly={session?.user?.id !== chat.userId}
         />
@@ -75,7 +82,9 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
         id={chat.id}
         initialMessages={convertToUIMessages(messagesFromDb)}
         selectedChatModel={chatModelFromCookie.value}
-        selectedProvider={providerIdFromCookie?.value || DEFAULT_PROVIDER}
+        selectedProviderModel={
+          providerModelIdFromCookie?.value || DEFAULT_PROVIDER
+        }
         selectedVisibilityType={chat.visibility}
         isReadonly={session?.user?.id !== chat.userId}
       />
