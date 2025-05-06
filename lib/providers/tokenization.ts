@@ -1,5 +1,5 @@
+import { getProviders } from "@/app/(chat)/actions/providers";
 import { tokenizeText } from "@/lib/actions/tokenize";
-import { AI_PROVIDER_CONFIG_KEY } from "../constants";
 
 interface Provider {
   id: string;
@@ -13,27 +13,9 @@ interface Provider {
   }>;
 }
 
-export const estimateTokens = async (
-  text: string,
-  activeProviderIds: string[]
-) => {
-  // Get provider configuration
-  const savedConfig = localStorage.getItem(AI_PROVIDER_CONFIG_KEY);
-  let providers: Provider[] = [];
-
-  if (savedConfig) {
-    try {
-      const config = JSON.parse(savedConfig);
-      if (config.providers) {
-        providers = config.providers.filter(
-          (p: Provider) => activeProviderIds.includes(p.id) && p.enabled
-        );
-      }
-    } catch (error) {
-      console.error("Failed to load saved configuration:", error);
-    }
-  }
-
+export const estimateTokens = async (text: string) => {
+  const { data: providers } = await getProviders();
+  console.log({ providers });
   const estimatedCost: { [providerId: string]: { [modelId: string]: number } } =
     {};
   const tokenCounts: { [providerId: string]: number } = {};

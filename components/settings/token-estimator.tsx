@@ -1,5 +1,4 @@
 "use client";
-
 import { CostBreakdown } from "@/components/settings/cost-breakdown";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -11,13 +10,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { AI_PROVIDER_CONFIG_KEY } from "@/lib/constants";
 import { extractPdfText, readFileContent } from "@/lib/file-utils";
-import { providersList } from "@/lib/providers/provider-list";
 import { estimateTokens } from "@/lib/providers/tokenization";
 import type { TokenizationResult } from "@/lib/types";
 import { FileText, Info, Loader2, MessageSquare, Upload } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export function TokenEstimator() {
   const [inputText, setInputText] = useState<string>("");
@@ -26,35 +23,14 @@ export function TokenEstimator() {
   const [tokenization, setTokenization] = useState<TokenizationResult | null>(
     null
   );
-  const [activeProviders, setActiveProviders] = useState<string[]>([]);
   const [estimateTab, setEstimateTab] = useState<string>("text");
-
-  // Load active providers
-  useEffect(() => {
-    const savedConfig = localStorage.getItem(AI_PROVIDER_CONFIG_KEY);
-    if (savedConfig) {
-      try {
-        const config = JSON.parse(savedConfig);
-        if (config.providers) {
-          setActiveProviders(
-            config.providers.filter((p: any) => p.enabled).map((p: any) => p.id)
-          );
-        }
-      } catch (error) {
-        console.error("Failed to load saved configuration:", error);
-      }
-    } else {
-      // Default to first provider if no saved config
-      setActiveProviders([providersList[0].id]);
-    }
-  }, []);
 
   const estimateTextTokens = async () => {
     if (!inputText.trim()) return;
-
     setIsProcessing(true);
     try {
-      const result = await estimateTokens(inputText, activeProviders);
+      const result = await estimateTokens(inputText);
+      console.log({ result });
       setTokenization(result);
     } catch (error) {
       console.error("Error estimating tokens:", error);
@@ -83,7 +59,7 @@ export function TokenEstimator() {
       }
 
       const limitedContent = fileContent.substring(0, 10000);
-      const result = await estimateTokens(limitedContent, activeProviders);
+      const result = await estimateTokens(limitedContent);
       setTokenization(result);
     } catch (error) {
       console.error("Error processing file:", error);

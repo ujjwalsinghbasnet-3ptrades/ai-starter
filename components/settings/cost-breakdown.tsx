@@ -1,5 +1,6 @@
 "use client";
 
+import { getProviders } from "@/app/(chat)/actions/providers";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -9,44 +10,23 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { AI_PROVIDER_CONFIG_KEY } from "@/lib/constants";
-import { providersList } from "@/lib/providers/provider-list";
-import type { TokenizationResult } from "@/lib/types";
+import type { Provider, TokenizationResult } from "@/lib/types";
 import { DollarSign } from "lucide-react";
-import { useMemo } from "react";
-
-interface Provider {
-  id: string;
-  name: string;
-  enabled: boolean;
-  models: Array<{
-    id: string;
-    name: string;
-    unitSize: number;
-    inputCost: number;
-    outputCost: number;
-    isImageModel: boolean;
-  }>;
-}
+import { useEffect, useMemo, useState } from "react";
 
 interface CostBreakdownProps {
   tokenization: TokenizationResult;
 }
 
 export function CostBreakdown({ tokenization }: CostBreakdownProps) {
-  const activeProviders = useMemo(() => {
-    const savedConfig = localStorage.getItem(AI_PROVIDER_CONFIG_KEY);
-    if (savedConfig) {
-      try {
-        const config = JSON.parse(savedConfig);
-        if (config.providers) {
-          return config.providers.filter((p: Provider) => p.enabled);
-        }
-      } catch (error) {
-        console.error("Failed to load saved configuration:", error);
-      }
-    }
-    return [providersList[0]];
+  const [activeProviders, setActiveProviders] = useState<Provider[]>([]);
+
+  useEffect(() => {
+    const fetchActiveProviders = async () => {
+      const { data } = await getProviders();
+      setActiveProviders(data);
+    };
+    fetchActiveProviders();
   }, []);
 
   // Calculate total costs

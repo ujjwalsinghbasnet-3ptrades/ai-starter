@@ -105,7 +105,6 @@ export function ProviderModelConfiguration() {
     const fetchProviders = async () => {
       try {
         const { providers, defaultProviderId } = await getUserSettings();
-        console.log({ providers });
         if (providers) {
           setProviders(providers);
           if (defaultProviderId) {
