@@ -1,18 +1,10 @@
+"use server";
+
 import { db } from "@/lib/db/db";
 import { models, providers, userProviderConfig } from "@/lib/db/schema";
 import type { Model, Provider } from "@/lib/types/providers";
 import type { InferSelectModel } from "drizzle-orm";
 import { eq } from "drizzle-orm";
-import { Bot, BrainCircuit, CloudCog, Sparkle, Zap } from "lucide-react";
-
-// Map icon strings to actual Lucide icon components
-const iconMap: Record<string, any> = {
-  Sparkle,
-  Bot,
-  CloudCog,
-  BrainCircuit,
-  Zap,
-};
 
 type DBProvider = InferSelectModel<typeof providers> & {
   models: Array<InferSelectModel<typeof models>>;
@@ -25,23 +17,29 @@ export async function getAllProviders(): Promise<Provider[]> {
       with: {
         models: true,
       },
-    })) as DBProvider[];
+    })) as unknown as DBProvider[];
 
     return dbProviders.map((provider) => ({
-      ...provider,
-      icon: iconMap[provider.icon],
+      id: provider.id,
+      name: provider.name,
+      description: provider.description,
+      icon: provider.icon,
+      bgColor: provider.bgColor,
       enabled: provider.enabled ?? false,
       models: provider.models.map((model) => ({
-        ...model,
+        id: model.id,
+        name: model.name,
+        description: model.description,
         inputCost: Number(model.inputCost),
         outputCost: Number(model.outputCost),
-        maxTokens: model.maxTokens || undefined,
+        unitSize: model.unitSize,
+        maxTokens: model.maxTokens ?? undefined,
         enabled: model.enabled ?? true,
-        isImageModel: model.isImageModel ?? undefined,
+        isImageModel: model.isImageModel ?? false,
       })),
     }));
   } catch (error) {
-    console.error("Failed to get all providers from database");
+    console.error("Failed to get all providers from database:", error);
     throw error;
   }
 }
@@ -62,7 +60,7 @@ export async function getProviderById(
 
     return {
       ...provider,
-      icon: iconMap[provider.icon],
+      icon: provider.icon,
       enabled: provider.enabled ?? false,
       models: provider.models.map((model) => ({
         ...model,
@@ -86,6 +84,8 @@ export async function getEnabledProviders(
   try {
     // Get all providers with their models
     const allProviders = await getAllProviders();
+
+    console.log({ allProviders });
 
     if (!userId) {
       // Return globally enabled providers if no user ID
@@ -329,6 +329,7 @@ export async function updateModelSetting(
     enabled?: boolean;
     customInputCost?: number;
     customOutputCost?: number;
+    isDefault?: boolean;
   }
 ): Promise<void> {
   try {
@@ -390,6 +391,18 @@ export async function addCustomModel(
       .toLowerCase()
       .replace(/\s+/g, "-")}`;
 
+    // First check if model already exists
+    const existingModel = await db.query.models.findFirst({
+      where: (models, { eq, and }) =>
+        and(eq(models.id, modelId), eq(models.providerId, providerId)),
+    });
+
+    if (existingModel) {
+      throw new Error(
+        "A model with this name already exists for this provider"
+      );
+    }
+
     await db.insert(models).values({
       id: modelId,
       providerId,
@@ -419,3 +432,14 @@ export async function deleteModel(modelId: string): Promise<void> {
     throw error;
   }
 }
+
+export async function updateUserModelSettings(
+  userId: string,
+  modelId: string,
+  settings: {
+    enabled?: boolean;
+    customInputCost?: number;
+    customOutputCost?: number;
+    isDefault?: boolean;
+  }
+) {}

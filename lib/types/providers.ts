@@ -1,5 +1,3 @@
-import type { LucideIcon } from "lucide-react";
-
 export interface Model {
   id: string;
   name: string;
@@ -17,7 +15,7 @@ export interface Provider {
   id: string;
   name: string;
   description: string;
-  icon: LucideIcon;
+  icon: string;
   enabled: boolean;
   bgColor: string;
   models: Model[];

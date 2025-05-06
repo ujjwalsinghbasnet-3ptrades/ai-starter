@@ -167,7 +167,7 @@ export const models = pgTable("Models", {
   id: text("id").primaryKey(),
   providerId: text("provider_id")
     .notNull()
-    .references(() => providers.id, { onDelete: "cascade" }),
+    .references(() => providers.id),
   name: text("name").notNull(),
   description: text("description").notNull(),
   inputCost: decimal("input_cost", { precision: 10, scale: 6 }).notNull(),
