@@ -1,18 +1,20 @@
+import { providerRegistry } from "@/lib/ai/ai-config";
 import { sheetPrompt, updateDocumentPrompt } from "@/lib/ai/prompts";
 import { createDocumentHandler } from "@/lib/artifacts/server";
-import { createProvider } from "@/lib/providers/provider-factory";
 import { streamObject } from "ai";
 import { z } from "zod";
 
 export const sheetDocumentHandler = createDocumentHandler<"sheet">({
   kind: "sheet",
-  onCreateDocument: async ({ title, dataStream }) => {
+  onCreateDocument: async ({ title, dataStream, selectedProviderModel }) => {
     let draftContent = "";
 
-    const myProvider = await createProvider();
+    const myProvider = providerRegistry.languageModel(
+      selectedProviderModel as any
+    );
 
     const { fullStream } = streamObject({
-      model: myProvider.languageModel("artifact-model"),
+      model: myProvider,
       system: sheetPrompt,
       prompt: title,
       schema: z.object({
@@ -45,13 +47,20 @@ export const sheetDocumentHandler = createDocumentHandler<"sheet">({
 
     return draftContent;
   },
-  onUpdateDocument: async ({ document, description, dataStream }) => {
+  onUpdateDocument: async ({
+    document,
+    description,
+    dataStream,
+    selectedProviderModel,
+  }) => {
     let draftContent = "";
 
-    const myProvider = await createProvider();
+    const myProvider = providerRegistry.languageModel(
+      selectedProviderModel as any
+    );
 
     const { fullStream } = streamObject({
-      model: myProvider.languageModel("artifact-model"),
+      model: myProvider,
       system: updateDocumentPrompt(document.content, "sheet"),
       prompt: description,
       schema: z.object({

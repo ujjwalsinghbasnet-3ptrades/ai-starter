@@ -3,6 +3,7 @@
 import type React from "react";
 
 import { setProviderModelCookie } from "@/app/(chat)/actions";
+import { getProviders } from "@/app/(chat)/actions/providers";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -14,13 +15,17 @@ import {
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { AI_PROVIDER_CONFIG_KEY } from "@/lib/constants";
-import { getEnabledProviders } from "@/lib/providers/provider-list";
 import type { Provider } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { ChevronRightIcon } from "lucide-react";
-import { startTransition, useMemo, useOptimistic, useState } from "react";
+import {
+  startTransition,
+  useEffect,
+  useMemo,
+  useOptimistic,
+  useState,
+} from "react";
 import { CheckCircleFillIcon, ChevronDownIcon } from "./icons";
-
 export function ProviderSelector({
   selectedProviderModelId,
   className,
@@ -42,7 +47,7 @@ export function ProviderSelector({
   const [expandedProviderId, setExpandedProviderId] = useState<string | null>(
     null
   );
-  const availableProviders = useMemo(() => getEnabledProviders(), []);
+  const [availableProviders, setAvailableProviders] = useState<Provider[]>([]);
 
   const selectedProvider = useMemo(
     () => availableProviders.find((p) => p.id === optimisticProviderId),
@@ -75,12 +80,6 @@ export function ProviderSelector({
 
     return selectedProvider.models.find((m) => m.enabled) || null;
   }, [selectedProvider, selectedModel]);
-
-  const registryKey = useMemo(() => {
-    if (!selectedProvider) return "";
-    if (!displayModel) return selectedProvider.id;
-    return `${selectedProvider.id}:${displayModel.id}`;
-  }, [selectedProvider, displayModel]);
 
   const toggleProviderExpanded = (providerId: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -120,6 +119,14 @@ export function ProviderSelector({
       setProviderModelCookie(`${providerId}:${modelId}`);
     });
   };
+
+  useEffect(() => {
+    const fetchActiveProviders = async () => {
+      const { data } = await getProviders();
+      setAvailableProviders(data);
+    };
+    fetchActiveProviders();
+  }, []);
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>

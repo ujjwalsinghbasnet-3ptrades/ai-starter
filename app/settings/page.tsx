@@ -42,7 +42,6 @@ export default function SettingsPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {/* <ProviderSelector /> */}
                 <ProviderModelConfiguration />
               </CardContent>
             </Card>

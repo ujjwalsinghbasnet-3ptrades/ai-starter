@@ -32,8 +32,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { providersList } from "@/lib/providers/provider-list";
-import type { Model, Provider } from "@/lib/types";
+import type { Provider } from "@/lib/types";
 import {
   Bot,
   BrainCircuit,
@@ -220,43 +219,43 @@ export function ProviderModelConfiguration() {
     setEditingModel(null);
   };
 
-  const resetToDefaultCosts = (providerId: string, modelId: string) => {
-    const originalProvider = providersList.find(
-      (p: Provider) => p.id === providerId
-    );
-    if (!originalProvider) return;
+  // const resetToDefaultCosts = (providerId: string, modelId: string) => {
+  //   const originalProvider = providersList.find(
+  //     (p: Provider) => p.id === providerId
+  //   );
+  //   if (!originalProvider) return;
 
-    const originalModel = originalProvider.models.find(
-      (m: Model) => m.id === modelId
-    );
-    if (!originalModel) return;
+  //   const originalModel = originalProvider.models.find(
+  //     (m: Model) => m.id === modelId
+  //   );
+  //   if (!originalModel) return;
 
-    setProviders(
-      providers.map((provider) => {
-        if (provider.id === providerId) {
-          const updatedModels = provider.models.map((model) => {
-            if (model.id === modelId) {
-              return {
-                ...model,
-                inputCost: originalModel.inputCost,
-                outputCost: originalModel.outputCost,
-                customCost: false,
-              };
-            }
-            return model;
-          });
-          return { ...provider, models: updatedModels };
-        }
-        return provider;
-      })
-    );
+  //   setProviders(
+  //     providers.map((provider) => {
+  //       if (provider.id === providerId) {
+  //         const updatedModels = provider.models.map((model) => {
+  //           if (model.id === modelId) {
+  //             return {
+  //               ...model,
+  //               inputCost: originalModel.inputCost,
+  //               outputCost: originalModel.outputCost,
+  //               customCost: false,
+  //             };
+  //           }
+  //           return model;
+  //         });
+  //         return { ...provider, models: updatedModels };
+  //       }
+  //       return provider;
+  //     })
+  //   );
 
-    toast({
-      type: "success",
-      description:
-        "This model's costs have been reset to their default values.",
-    });
-  };
+  //   toast({
+  //     type: "success",
+  //     description:
+  //       "This model's costs have been reset to their default values.",
+  //   });
+  // };
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -713,12 +712,7 @@ export function ProviderModelConfiguration() {
                                         variant="link"
                                         size="sm"
                                         className="h-auto p-0 text-xs"
-                                        onClick={() =>
-                                          resetToDefaultCosts(
-                                            provider.id,
-                                            model.id
-                                          )
-                                        }
+                                        onClick={() => {}}
                                       >
                                         Reset to default pricing
                                       </Button>

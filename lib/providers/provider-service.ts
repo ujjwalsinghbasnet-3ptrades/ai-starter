@@ -85,8 +85,6 @@ export async function getEnabledProviders(
     // Get all providers with their models
     const allProviders = await getAllProviders();
 
-    console.log({ allProviders });
-
     if (!userId) {
       // Return globally enabled providers if no user ID
       return allProviders.filter((p) => p.enabled);

@@ -1,16 +1,18 @@
+import { providerRegistry } from "@/lib/ai/ai-config";
 import { createDocumentHandler } from "@/lib/artifacts/server";
-import { createProvider } from "@/lib/providers/provider-factory";
 import { experimental_generateImage } from "ai";
 
 export const imageDocumentHandler = createDocumentHandler<"image">({
   kind: "image",
-  onCreateDocument: async ({ title, dataStream }) => {
+  onCreateDocument: async ({ title, dataStream, selectedProviderModel }) => {
     let draftContent = "";
 
-    const myProvider = await createProvider();
+    const myProvider = providerRegistry.imageModel(
+      selectedProviderModel as any
+    );
 
     const { image } = await experimental_generateImage({
-      model: myProvider.imageModel("small-model"),
+      model: myProvider,
       prompt: title,
       n: 1,
     });
@@ -24,13 +26,19 @@ export const imageDocumentHandler = createDocumentHandler<"image">({
 
     return draftContent;
   },
-  onUpdateDocument: async ({ description, dataStream }) => {
+  onUpdateDocument: async ({
+    description,
+    dataStream,
+    selectedProviderModel,
+  }) => {
     let draftContent = "";
 
-    const myProvider = await createProvider();
+    const myProvider = providerRegistry.imageModel(
+      selectedProviderModel as any
+    );
 
     const { image } = await experimental_generateImage({
-      model: myProvider.imageModel("small-model"),
+      model: myProvider,
       prompt: description,
       n: 1,
     });

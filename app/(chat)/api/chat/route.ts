@@ -42,11 +42,9 @@ export async function POST(request: Request) {
       selectedChatModel: string;
       selectedProviderModel: string;
     } = await request.json();
-    console.log({ selectedChatModel, selectedProviderModel });
     const myProvider = providerRegistry.languageModel(
       selectedProviderModel as any
     );
-    console.log({ myProvider });
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
@@ -64,6 +62,7 @@ export async function POST(request: Request) {
     if (!chat) {
       const title = await generateTitleFromUserMessage({
         message: userMessage,
+        providerId: selectedProviderModel,
       });
 
       await saveChat({ id, userId: session.user.id, title });
@@ -105,8 +104,16 @@ export async function POST(request: Request) {
           experimental_generateMessageId: generateUUID,
           tools: {
             getWeather,
-            createDocument: createDocument({ session, dataStream }),
-            updateDocument: updateDocument({ session, dataStream }),
+            createDocument: createDocument({
+              session,
+              dataStream,
+              selectedProviderModel,
+            }),
+            updateDocument: updateDocument({
+              session,
+              dataStream,
+              selectedProviderModel,
+            }),
             requestSuggestions: requestSuggestions({
               session,
               dataStream,

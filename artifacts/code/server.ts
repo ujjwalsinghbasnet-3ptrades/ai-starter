@@ -1,18 +1,20 @@
+import { providerRegistry } from "@/lib/ai/ai-config";
 import { codePrompt, updateDocumentPrompt } from "@/lib/ai/prompts";
 import { createDocumentHandler } from "@/lib/artifacts/server";
-import { createProvider } from "@/lib/providers/provider-factory";
 import { streamObject } from "ai";
 import { z } from "zod";
 
 export const codeDocumentHandler = createDocumentHandler<"code">({
   kind: "code",
-  onCreateDocument: async ({ title, dataStream }) => {
+  onCreateDocument: async ({ title, dataStream, selectedProviderModel }) => {
     let draftContent = "";
 
-    const myProvider = await createProvider();
+    const myProvider = providerRegistry.languageModel(
+      selectedProviderModel as any
+    );
 
     const { fullStream } = streamObject({
-      model: myProvider.languageModel("artifact-model"),
+      model: myProvider,
       system: codePrompt,
       prompt: title,
       schema: z.object({
@@ -40,11 +42,18 @@ export const codeDocumentHandler = createDocumentHandler<"code">({
 
     return draftContent;
   },
-  onUpdateDocument: async ({ document, description, dataStream }) => {
+  onUpdateDocument: async ({
+    document,
+    description,
+    dataStream,
+    selectedProviderModel,
+  }) => {
     let draftContent = "";
-    const myProvider = await createProvider();
+    const myProvider = providerRegistry.languageModel(
+      selectedProviderModel as any
+    );
     const { fullStream } = streamObject({
-      model: myProvider.languageModel("artifact-model"),
+      model: myProvider,
       system: updateDocumentPrompt(document.content, "code"),
       prompt: description,
       schema: z.object({

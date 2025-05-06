@@ -1,17 +1,19 @@
+import { providerRegistry } from "@/lib/ai/ai-config";
 import { updateDocumentPrompt } from "@/lib/ai/prompts";
 import { createDocumentHandler } from "@/lib/artifacts/server";
-import { createProvider } from "@/lib/providers/provider-factory";
 import { smoothStream, streamText } from "ai";
 
 export const textDocumentHandler = createDocumentHandler<"text">({
   kind: "text",
-  onCreateDocument: async ({ title, dataStream }) => {
+  onCreateDocument: async ({ title, dataStream, selectedProviderModel }) => {
     let draftContent = "";
 
-    const myProvider = await createProvider();
+    const myProvider = providerRegistry.languageModel(
+      selectedProviderModel as any
+    );
 
     const { fullStream } = streamText({
-      model: myProvider.languageModel("artifact-model"),
+      model: myProvider,
       system:
         "Write about the given topic. Markdown is supported. Use headings wherever appropriate.",
       experimental_transform: smoothStream({ chunking: "word" }),
@@ -35,13 +37,20 @@ export const textDocumentHandler = createDocumentHandler<"text">({
 
     return draftContent;
   },
-  onUpdateDocument: async ({ document, description, dataStream }) => {
+  onUpdateDocument: async ({
+    document,
+    description,
+    dataStream,
+    selectedProviderModel,
+  }) => {
     let draftContent = "";
 
-    const myProvider = await createProvider();
+    const myProvider = providerRegistry.languageModel(
+      selectedProviderModel as any
+    );
 
     const { fullStream } = streamText({
-      model: myProvider.languageModel("artifact-model"),
+      model: myProvider,
       system: updateDocumentPrompt(document.content, "text"),
       experimental_transform: smoothStream({ chunking: "word" }),
       prompt: description,
