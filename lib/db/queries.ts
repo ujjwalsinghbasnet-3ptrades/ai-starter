@@ -1,4 +1,4 @@
-import "server-only";
+"use server";
 
 import {
   and,
@@ -38,6 +38,12 @@ export async function getUser(email: string): Promise<Array<User>> {
 }
 
 export async function createUser(email: string, password: string) {
+  const existingUser = await getUser(email);
+
+  if (existingUser.length > 0) {
+    throw new Error("User already exists");
+  }
+
   const hashedPassword = generateHashedPassword(password);
 
   try {

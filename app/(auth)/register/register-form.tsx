@@ -1,55 +1,54 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect } from "react"
-import { useSession } from "next-auth/react"
-import { useRouter } from "next/navigation"
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { toast } from "@/components/toast"
+import { toast } from "@/components/toast";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { createUser } from "@/lib/db/queries";
 
 export function RegisterForm() {
-  const router = useRouter()
-  const { data: session, status } = useSession()
-  const [isLoading, setIsLoading] = useState(false)
-  const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const router = useRouter();
+  const { data: session, status } = useSession();
+  const [isLoading, setIsLoading] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   // Redirect if already authenticated
   useEffect(() => {
     if (status === "authenticated" && session) {
-      router.push("/")
+      router.push("/");
     }
-  }, [session, status, router])
+  }, [session, status, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
 
     try {
-      // In a real application, you would send a request to your API to create a new user
-      // For this demo, we'll just simulate a successful registration
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      await createUser(email, password);
 
       toast({
         type: "success",
         description: "Account created successfully. You can now sign in.",
-      })
+      });
 
-      router.push("/sign-in")
+      router.push("/sign-in");
     } catch (error) {
       toast({
         type: "error",
         description: "Something went wrong",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="grid gap-6">
@@ -96,5 +95,5 @@ export function RegisterForm() {
         </div>
       </form>
     </div>
-  )
+  );
 }
